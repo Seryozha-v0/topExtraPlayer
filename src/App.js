@@ -2,9 +2,10 @@ import React, { useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import screenfull from "screenfull";
 import './index.css';
-// import videos from './videos';
+import videos from './videos';
 
 import Controls from './components/Video/Controls';
+import Lists from './components/Video/Lists';
 
 const format = (seconds) => {
   if (isNaN(seconds)) {
@@ -112,10 +113,6 @@ function App() {
     setVideoStates({ ...videoStates, volume: parseFloat(value / 100), muted: value === 0 ? true : false });
   }
 
-  const handleVideoRate = (rate) => {
-    setVideoStates({ ...videoStates, videoBackRate: rate });
-  }
-
   const handleFullScreenMode = () => {
     screenfull.toggle(videoDivRef.current);
   }
@@ -131,13 +128,22 @@ function App() {
   const popOpen = Boolean(anchorEl);
   const popId = popOpen ? 'simple-popover' : undefined;
 
+  const handleVideoRate = (rate) => {
+    setVideoStates({ ...videoStates, videoBackRate: rate });
+    handlePopClose();
+  }
+
+  const ended = () => {
+    console.log('end');
+  }
+
   return (
     <div className="video">
       <div className="video__wrap" ref={videoDivRef} onMouseMove={handleControlsShow}>
         <ReactPlayer
           width={'100%'}
           height='100%'
-          url={'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'}
+          url={'http://localhost:4400/uploads/videos/Trim1.mkv'}
           ref={videoRef}
           className='video__player'
           controls={false}
@@ -145,7 +151,7 @@ function App() {
           muted={muted}
           onProgress={handleVideoProgress}
           playbackRate={videoBackRate}
-          onEnded={() => console.log('end')}
+          onEnded={ended}
         />
         <Controls
           controlsShow={controlsShow}
@@ -171,6 +177,11 @@ function App() {
           popClick={handlePopClick}
           popClose={handlePopClose}
           fullScreenMode={handleFullScreenMode}
+        />
+      </div>
+      <div className="videos__lists">
+        <Lists
+          videos={videos}
         />
       </div>
     </div>

@@ -107,7 +107,7 @@ const controls = ({
                 <Grid
                     container
                     direction='row'
-                    alignItems='end'
+                    alignItems='flex-end'
                     justifyContent='space-between'
                     style={{ padding: 2 }}
                 >
@@ -149,24 +149,36 @@ const controls = ({
                                 )}
                             </IconButton>
 
-                            <IconButton className="video__icons" aria-label="reqind" onClick={muting}>
-                                {muted ? (
-                                    <VolumeOff fontSize="large" style={{ color: '#fff' }} />
-                                ) : (
-                                    <VolumeUp fontSize="large" style={{ color: '#fff' }} />
-                                )}
-                            </IconButton>
+                            <Grid item>
+                                <Grid
+                                    container
+                                    alignItems='center'
+                                    style={{ minWidth: '150px' }}
+                                >
+                                    <Grid item>
+                                        <IconButton className="video__icons" aria-label="reqind" onClick={muting}>
+                                            {muted ? (
+                                                <VolumeOff fontSize="large" style={{ color: '#fff' }} />
+                                            ) : (
+                                                <VolumeUp fontSize="large" style={{ color: '#fff' }} />
+                                            )}
+                                        </IconButton>
+                                    </Grid>
+                                    <Grid item xs>
+                                        <Slider
+                                            min={0}
+                                            max={100}
+                                            value={volume * 100}
+                                            step={10}
+                                            valueLabelDisplay="auto"
+                                            className='video__slider'
+                                            onChange={volumeChange}
+                                            onChangeCommitted={volumeSeek}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
 
-                            <Typography style={{ color: '#fff', paddingTop: '5px' }}>{volume * 100}</Typography>
-                            <Slider
-                                min={0}
-                                max={100}
-                                value={volume * 100}
-                                step={10}
-                                className='video__slider'
-                                onChange={volumeChange}
-                                onChangeCommitted={volumeSeek}
-                            />
                         </Grid>
                     </Grid>
 

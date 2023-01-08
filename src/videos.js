@@ -1,5 +1,3 @@
-import jojo from './assets/Невероятные приключения ДжоДжо_S02E44_Миазмы пустоты Ванилла Айс, часть 3.mkv'
-
 export default [
     {
         title: 'video title',
@@ -7,6 +5,6 @@ export default [
     },
     {
         title: 'video title 2',
-        videoUrl: jojo,
+        videoUrl: 'http://localhost:4400/uploads/videos/Trim1.mkv',
     }
 ]

@@ -9,9 +9,6 @@
     margin: 0 auto;
 }
 
-.video .video__player {
-}
-
 .video .video__wrap {
     position: relative;
     overflow: hidden;
@@ -54,8 +51,8 @@
 }
 
 .video .video__slider {
-    margin-top: -55px;
-    margin-left: 130px;
+    /* margin-top: -55px;
+    margin-left: 130px; */
 }
 
 .video .video__bottom-icons {
