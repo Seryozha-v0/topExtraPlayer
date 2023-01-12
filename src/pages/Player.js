@@ -25,7 +25,7 @@ const format = (seconds) => {
     }
 }
 
-function Player() {
+const Player = () => {
     const params = useParams();
     const Navigate = useNavigate();
     const [playerStates, setPlayerStates] = useState({
@@ -38,19 +38,6 @@ function Player() {
         time: 5,
     });
 
-    useEffect(() => {
-        const videoId = params.id;
-        for (const video of videos) {
-            if (video._id === videoId) {
-                setPlayerStates({
-                    current: video,
-                    list: videos.sort(() => Math.random() - 0.3),
-                    isLoading: false,
-                });
-            }
-        }
-    }, []);
-
     const [videoStates, setVideoStates] = useState({
         playing: true,
         muted: true,
@@ -58,6 +45,7 @@ function Player() {
         videoBackRate: 1.0,
         played: 0,
         seeking: false,
+        fullscreen: false,
     });
     const [controlsShow, setControlsShow] = useState(false);
 
@@ -141,7 +129,10 @@ function Player() {
     }
 
     const handleFullScreenMode = () => {
-        screenfull.toggle(videoDivRef.current);
+        setVideoStates({
+            ...videoStates,
+            fullscreen: !videoStates.fullscreen,
+        })
     }
 
     //Popover
@@ -198,6 +189,32 @@ function Player() {
         startNextVideoTimer();
         startNextCancelTimer();
     }
+
+    useEffect(() => {
+        cancelNextVideo();
+
+        const videoId = params.id;
+        const index = videos.findIndex((el) => el._id == videoId);
+
+        setPlayerStates({
+            current: videos[index],
+            list: videos.sort(() => Math.random() - 0.3),
+            isLoading: false,
+        });
+        
+        setVideoStates({
+            ...videoStates,
+            playing: true,
+        });
+    }, [params]);
+
+    useEffect(() => {
+        if (videoStates.fullscreen) {
+            screenfull.request(videoDivRef.current);
+        } else {
+            screenfull.exit();
+        }
+    }, [videoStates.fullscreen, params])
 
     return (
         <div className="video">
