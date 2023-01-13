@@ -8,7 +8,7 @@ function App() {
   return (
     <div className="wrapper">
       <div style={{height: '50px', background: 'green', color: 'white', textAlign: 'center', marginBottom: '10px'}}>
-        header
+        Simple header
       </div>
       <Routes>
         <Route path="/video/" element={<Home />} />

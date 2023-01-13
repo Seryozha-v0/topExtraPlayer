@@ -40,16 +40,15 @@ const Player = () => {
 
     const [videoStates, setVideoStates] = useState({
         playing: true,
-        muted: true,
+        muted: false,
         volume: 0.5,
         videoBackRate: 1.0,
         played: 0,
-        seeking: false,
         fullscreen: false,
     });
     const [controlsShow, setControlsShow] = useState(false);
 
-    const { playing, muted, volume, videoBackRate, played, seeking } = videoStates;
+    const { playing, muted, volume, videoBackRate, played } = videoStates;
     const videoRef = useRef(null);
 
     const currVideoTime = videoRef.current ? videoRef.current.getCurrentTime() : '00:00';
@@ -71,6 +70,8 @@ const Player = () => {
     }
 
     const handlePlayAndPause = () => {
+        cancelNextVideo();
+        
         setVideoStates({
             ...videoStates,
             playing: !videoStates.playing,
@@ -156,8 +157,7 @@ const Player = () => {
         const next = playerStates.list[0];
 
         controlsTimerRef.current = setTimeout(() => {
-            Navigate(`/video/${next._id}`);
-            return window.location.reload()
+            return Navigate(`/video/${next._id}`);
         }, 5000);
     };
 
@@ -179,7 +179,6 @@ const Player = () => {
     }
 
     const ended = () => {
-        console.log('end');
         setVideoStates({
             ...videoStates,
             playing: !videoStates.playing,
@@ -189,77 +188,87 @@ const Player = () => {
         startNextVideoTimer();
         startNextCancelTimer();
     }
-
-    useEffect(() => {
-        cancelNextVideo();
-
-        const videoId = params.id;
-        const index = videos.findIndex((el) => el._id == videoId);
-
-        setPlayerStates({
-            current: videos[index],
-            list: videos.sort(() => Math.random() - 0.3),
-            isLoading: false,
-        });
-        
-        setVideoStates({
-            ...videoStates,
-            playing: true,
-        });
-    }, [params]);
-
+    
     useEffect(() => {
         if (videoStates.fullscreen) {
             screenfull.request(videoDivRef.current);
         } else {
             screenfull.exit();
         }
-    }, [videoStates.fullscreen, params])
+    }, [videoStates.fullscreen]);
+
+    useEffect(() => {
+        cancelNextVideo();
+
+        const videoId = params.id;
+        const currIndex = videos.findIndex((el) => el._id == videoId);
+        const list = [];
+
+        for (let i = 0; i < videos.length; i++) {
+            const element = videos[i];
+            if (i === currIndex) {
+                continue;
+            }
+            list.push(videos[i]);
+        }
+
+        setPlayerStates({
+            current: videos[currIndex],
+            list: list.sort(() => Math.random() - 0.3),
+            isLoading: false,
+        });
+        setVideoStates({
+            ...videoStates,
+            playing: true,
+        });
+    }, [params]);
 
     return (
         <div className="video">
-            {playerStates.isLoading ? 'loading...' : (
-                <div className="video__wrap" ref={videoDivRef} onMouseMove={handleControlsShow}>
-                    <ReactPlayer
-                        width={'100%'}
-                        height='100%'
-                        url={playerStates.current.videoUrl}
-                        ref={videoRef}
-                        className='video__player'
-                        controls={false}
-                        playing={playing}
-                        muted={muted}
-                        onProgress={handleVideoProgress}
-                        playbackRate={videoBackRate}
-                        onEnded={ended}
-                    />
-                    <Controls
-                        controlsShow={controlsShow}
-                        playing={videoStates.playing}
-                        played={played}
-                        playedTime={playedTime}
-                        fullMovieTime={fullMovieTime}
-                        muted={muted}
-                        volume={volume}
-                        videoBackRate={videoBackRate}
-                        anchorEl={anchorEl}
-                        id={popId}
-                        popOpen={popOpen}
-                        playAndPause={handlePlayAndPause}
-                        rewind={handleRewind}
-                        fastForward={handleFastForward}
-                        onSeek={handleVideoSeek}
-                        onMouseSeekUp={handleVideoMouseSeekUp}
-                        muting={handleMuting}
-                        volumeChange={handleVolumeChange}
-                        volumeSeek={handleVolumeSeek}
-                        videoRate={handleVideoRate}
-                        popClick={handlePopClick}
-                        popClose={handlePopClose}
-                        fullScreenMode={handleFullScreenMode}
-                    />
-                </div>
-            )}
+            <div className="video__wrap" ref={videoDivRef} onMouseMove={handleControlsShow}>
+                {playerStates.isLoading ? 'loading...' : (
+                    <>
+                        <ReactPlayer
+                            width={'100%'}
+                            height='100%'
+                            url={playerStates.current.videoUrl}
+                            ref={videoRef}
+                            className='video__player'
+                            controls={false}
+                            playing={playing}
+                            muted={muted}
+                            onProgress={handleVideoProgress}
+                            playbackRate={videoBackRate}
+                            onEnded={ended}
+                        />
+                        <Controls
+                            controlsShow={controlsShow}
+                            playing={videoStates.playing}
+                            played={played}
+                            playedTime={playedTime}
+                            fullMovieTime={fullMovieTime}
+                            muted={muted}
+                            volume={volume}
+                            videoBackRate={videoBackRate}
+                            anchorEl={anchorEl}
+                            id={popId}
+                            popOpen={popOpen}
+                            playAndPause={handlePlayAndPause}
+                            rewind={handleRewind}
+                            fastForward={handleFastForward}
+                            onSeek={handleVideoSeek}
+                            onMouseSeekUp={handleVideoMouseSeekUp}
+                            muting={handleMuting}
+                            volumeChange={handleVolumeChange}
+                            volumeSeek={handleVolumeSeek}
+                            videoRate={handleVideoRate}
+                            popClick={handlePopClick}
+                            popClose={handlePopClose}
+                            fullScreenMode={handleFullScreenMode}
+                        />
+                    </>
+                )}
+            </div>
             {nextCounter.isNext ? (
                 <>
                     <div>Переход через {nextCounter.time}...</div>
