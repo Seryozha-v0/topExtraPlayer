@@ -1,15 +1,24 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Grid, Typography } from "@mui/material";
 
 const Lists = ({ videos }) => {
+    const Navigate = useNavigate();
     return (
         <>
             {videos.map((item, i) => (
-                <div key={i} style={{ margin: '10px 0', border: '1px solid black' }}>
-                    <Link to={`/video/${item._id}`}>
-                        <img src={item.previewImage} style={{ width: '100px', border: '1px solid red' }} />
-                    </Link>
-                    <Link to={`/video/${item._id}`}><p>{item.title}</p></Link>
+                <div
+                    key={i}
+                    className="video-list__item"
+                    onClick={() => { return Navigate(`/video/${item._id}`) }}
+                >
+                    <div className="video-list__img">
+                        <img src={item.previewImage} />
+                    </div>
+                    <div className="video-list__desc">
+                        <Typography variant="h6">{item.title}</Typography>
+                        <Typography variant="subtitle1">{item.author}</Typography>
+                    </div>
                 </div>
             ))}
         </>

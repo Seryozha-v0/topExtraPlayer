@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover } from "@mui/material";
+import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover, CircularProgress } from "@mui/material";
 import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff } from "@mui/icons-material";
 
 const controls = ({
@@ -26,6 +26,10 @@ const controls = ({
     id,
     popOpen,
     fullScreenMode,
+    isNext,
+    nextTime,
+    cancelNext,
+    nextProgress
 }) => {
     const PrettoSlider = styled(Slider)({
         height: 5,
@@ -66,7 +70,7 @@ const controls = ({
     });
 
     return (
-        <div className={controlsShow ? "video__controls video__controls_active" : "video__controls"}>
+        <div className={`video__controls ${controlsShow ? "video__controls_active" : ""}`}>
             <Grid
                 container
                 direction='row'
@@ -87,45 +91,41 @@ const controls = ({
                     alignItems='center'
                     justifyContent='center'
                 >
-                    <IconButton className="video__icons" aria-label="reqind" onClick={rewind} >
-                        <FastRewind fontSize="large" style={{ color: '#fff' }} />
-                    </IconButton>
+                    {isNext ? (
+                        <>
+                            <div>Переход через {nextTime}...</div>
+                            <button onClick={cancelNext}>Отмена</button>
+                        </>
+                    ) : (
+                        <>
+                            <IconButton className="video__icons" aria-label="reqind" onClick={rewind} >
+                                <FastRewind fontSize="large" style={{ color: '#fff' }} />
+                            </IconButton>
 
-                    <IconButton className="video__icons" aria-label="reqind" onClick={playAndPause} >
-                        {playing ? (
-                            <PauseSharp fontSize="large" style={{ color: '#fff' }} />
-                        ) : (
-                            <PlayArrowSharp fontSize="large" style={{ color: '#fff' }} />
-                        )}
-                    </IconButton>
+                            <IconButton className="video__icons" aria-label="reqind" onClick={playAndPause} >
+                                {playing ? (
+                                    <PauseSharp fontSize="large" style={{ color: '#fff' }} />
+                                ) : (
+                                    <PlayArrowSharp fontSize="large" style={{ color: '#fff' }} />
+                                )}
+                            </IconButton>
 
-                    <IconButton className="video__icons" aria-label="reqind" onClick={fastForward} >
-                        <FastForwardSharp fontSize="large" style={{ color: '#fff' }} />
-                    </IconButton>
+                            <IconButton className="video__icons" aria-label="reqind" onClick={fastForward} >
+                                <FastForwardSharp fontSize="large" style={{ color: '#fff' }} />
+                            </IconButton>
+                        </>
+                    )}
                 </Grid>
 
                 <Grid
                     container
                     direction='row'
-                    alignItems='flex-end'
+                    alignContent='flex-end'
+                    alignItems='center'
                     justifyContent='space-between'
                     style={{ padding: 2 }}
                 >
                     <Grid item xs={12}>
-                        <Grid
-                            container
-                            direction='row'
-                            justifyContent='space-between'
-                        >
-                            <Typography variant="h7" style={{ color: 'white' }} >
-                                {playedTime}
-                            </Typography>
-
-                            <Typography variant="h7" style={{ color: 'white' }} >
-                                {fullMovieTime}
-                            </Typography>
-                        </Grid>
-
                         <PrettoSlider
                             min={0}
                             max={100}
@@ -179,6 +179,16 @@ const controls = ({
                                 </Grid>
                             </Grid>
 
+                            <Grid item ml={2}>
+                                <Typography variant="h7" style={{ color: 'white' }} >
+                                    {playedTime}
+                                </Typography>
+                                /
+                                <Typography variant="h7" style={{ color: 'white' }} >
+                                    {fullMovieTime}
+                                </Typography>
+                            </Grid>
+
                         </Grid>
                     </Grid>
 
@@ -192,6 +202,10 @@ const controls = ({
                             anchorEl={anchorEl}
                             onClose={popClose}
                             anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                            transformOrigin={{
                                 vertical: 'bottom',
                                 horizontal: 'left',
                             }}

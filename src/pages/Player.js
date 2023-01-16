@@ -40,13 +40,13 @@ const Player = () => {
 
     const [videoStates, setVideoStates] = useState({
         playing: true,
-        muted: false,
+        muted: true,
         volume: 0.5,
         videoBackRate: 1.0,
         played: 0,
         fullscreen: false,
     });
-    const [controlsShow, setControlsShow] = useState(false);
+    const [controlsShow, setControlsShow] = useState(true);
 
     const { playing, muted, volume, videoBackRate, played } = videoStates;
     const videoRef = useRef(null);
@@ -61,11 +61,24 @@ const Player = () => {
     const controlsTimerRef = useRef(null);
     const nextTimeRef = useRef(null);
 
+    //Popover
+    const [anchorEl, setAnchorEl] = useState(null);
+    const handlePopClick = (e) => {
+        setAnchorEl(e.currentTarget);
+    };
+    const handlePopClose = () => {
+        setAnchorEl(null);
+    };
+    const popOpen = Boolean(anchorEl);
+    const popId = popOpen ? 'simple-popover' : undefined;
+
+    
     const startControlsTimer = () => {
         clearInterval(controlsTimerRef.current);
 
         controlsTimerRef.current = setTimeout(() => {
             setControlsShow(false);
+            handlePopClose();
         }, 3000);
     }
 
@@ -136,17 +149,6 @@ const Player = () => {
         })
     }
 
-    //Popover
-    const [anchorEl, setAnchorEl] = useState(null);
-    const handlePopClick = (e) => {
-        setAnchorEl(e.currentTarget);
-    };
-    const handlePopClose = () => {
-        setAnchorEl(null);
-    };
-    const popOpen = Boolean(anchorEl);
-    const popId = popOpen ? 'simple-popover' : undefined;
-
     const handleVideoRate = (rate) => {
         setVideoStates({ ...videoStates, videoBackRate: rate });
         handlePopClose();
@@ -199,6 +201,9 @@ const Player = () => {
 
     useEffect(() => {
         cancelNextVideo();
+
+        setControlsShow(true);
+        startControlsTimer();
 
         const videoId = params.id;
         const currIndex = videos.findIndex((el) => el._id == videoId);
@@ -253,6 +258,8 @@ const Player = () => {
                             anchorEl={anchorEl}
                             id={popId}
                             popOpen={popOpen}
+                            isNext={nextCounter.isNext}
+                            nextTime={nextCounter.time}
                             playAndPause={handlePlayAndPause}
                             rewind={handleRewind}
                             fastForward={handleFastForward}
@@ -265,16 +272,11 @@ const Player = () => {
                             popClick={handlePopClick}
                             popClose={handlePopClose}
                             fullScreenMode={handleFullScreenMode}
+                            cancelNext={cancelNextVideo}
                         />
                     </>
                 )}
             </div>
-            {nextCounter.isNext ? (
-                <>
-                    <div>Переход через {nextCounter.time}...</div>
-                    <button onClick={cancelNextVideo}>Отмена</button>
-                </>
-            ) : ('')}
             <div className="videos__lists">
                 {playerStates.isLoading ? 'loading...' : (
                     <Lists
