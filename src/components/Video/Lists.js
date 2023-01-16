@@ -13,7 +13,7 @@ const Lists = ({ videos }) => {
                     onClick={() => { return Navigate(`/video/${item._id}`) }}
                 >
                     <div className="video-list__img">
-                        <img src={item.previewImage} />
+                        <img src={item.imageUrl} />
                     </div>
                     <div className="video-list__desc">
                         <Typography variant="h6">{item.title}</Typography>

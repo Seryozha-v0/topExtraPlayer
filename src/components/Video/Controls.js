@@ -1,6 +1,8 @@
 import React from "react";
-import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover, CircularProgress } from "@mui/material";
+import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover } from "@mui/material";
+import ButtonM from "@mui/material/Button";
 import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 const controls = ({
     controlsShow,
@@ -29,7 +31,8 @@ const controls = ({
     isNext,
     nextTime,
     cancelNext,
-    nextProgress
+    nextVideo,
+    goNextVideo
 }) => {
     const PrettoSlider = styled(Slider)({
         height: 5,
@@ -85,37 +88,58 @@ const controls = ({
                     </Typography>
                 </Grid>
 
-                <Grid
-                    container
-                    direction='row'
-                    alignItems='center'
-                    justifyContent='center'
-                >
-                    {isNext ? (
-                        <>
-                            <div>Переход через {nextTime}...</div>
-                            <button onClick={cancelNext}>Отмена</button>
-                        </>
-                    ) : (
-                        <>
-                            <IconButton className="video__icons" aria-label="reqind" onClick={rewind} >
-                                <FastRewind fontSize="large" style={{ color: '#fff' }} />
-                            </IconButton>
 
-                            <IconButton className="video__icons" aria-label="reqind" onClick={playAndPause} >
-                                {playing ? (
-                                    <PauseSharp fontSize="large" style={{ color: '#fff' }} />
-                                ) : (
-                                    <PlayArrowSharp fontSize="large" style={{ color: '#fff' }} />
-                                )}
-                            </IconButton>
+                {isNext ? (
+                    <Grid
+                        container
+                        direction='column'
+                        alignContent='center'
+                        alignItems='felc-start'
+                        justifyContent='center'
+                    >
+                        <div>Воспроизведение через {nextTime}...</div>
+                        <div
+                            className="video-list__item video-list_next"
+                        >
+                            <div className="video-list__img">
+                                <img src={nextVideo.imageUrl} />
+                            </div>
+                            <div className="video-list__desc">
+                                <Typography variant="h6">{nextVideo.title}</Typography>
+                                <Typography variant="subtitle1">{nextVideo.author}</Typography>
+                            </div>
+                        </div>
+                        <Grid item>
+                            <Grid container>
+                                <Button variant="outlined" className="video-list_next-btn" onClick={cancelNext}>Отмена</Button>
+                                <Button variant="contained" className="video-list_next-btn"><Link to={`/video/${nextVideo._id}`}>Воспроизвести</Link></Button>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                ) : (
+                    <Grid
+                        container
+                        direction='row'
+                        alignItems='center'
+                        justifyContent='center'
+                    >
+                        <IconButton className="video__icons" aria-label="reqind" onClick={rewind} >
+                            <FastRewind fontSize="large" style={{ color: '#fff' }} />
+                        </IconButton>
 
-                            <IconButton className="video__icons" aria-label="reqind" onClick={fastForward} >
-                                <FastForwardSharp fontSize="large" style={{ color: '#fff' }} />
-                            </IconButton>
-                        </>
-                    )}
-                </Grid>
+                        <IconButton className="video__icons" aria-label="reqind" onClick={playAndPause} >
+                            {playing ? (
+                                <PauseSharp fontSize="large" style={{ color: '#fff' }} />
+                            ) : (
+                                <PlayArrowSharp fontSize="large" style={{ color: '#fff' }} />
+                            )}
+                        </IconButton>
+
+                        <IconButton className="video__icons" aria-label="reqind" onClick={fastForward} >
+                            <FastForwardSharp fontSize="large" style={{ color: '#fff' }} />
+                        </IconButton>
+                    </Grid>
+                )}
 
                 <Grid
                     container
