@@ -148,5 +148,15 @@ header {
 .home-list .video-list__desc {
     padding: 10px;
 }
-/* .home-list {
-} */
+
+@media (max-width: 968px) {
+    .video {
+        flex-direction: column;
+    }
+    .video__wrap, .videos__lists {
+        width: 100%;
+    }
+    .video__wrap {
+        margin-bottom: 50px;
+    }
+}
