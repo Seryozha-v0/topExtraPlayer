@@ -1,9 +1,21 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from '../../axios';
 
-export const fetchVideos = createAsyncThunk('videos/fetchVideos', async () => {
+export const fetchVideos = createAsyncThunk('videos/fetchVideos', async (currId) => {
     const { data } = await axios.get('/videos').catch((err) => console.log(err.responce.data.message));
-    return data;
+    const list = [];
+    if(currId) {
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (element._id === currId) {
+                continue;
+            }
+            list.push(element);
+        }
+        return list;
+    } else {
+        return data;
+    }
 });
 
 const initialState = {

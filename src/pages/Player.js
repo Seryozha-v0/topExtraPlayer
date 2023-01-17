@@ -2,14 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import screenfull from "screenfull";
 import '../index.css';
-import videos from '../videos';
+import videosL from '../videos';
 
 import Controls from '../components/Video/Controls';
 import Lists from '../components/Video/Lists';
+import axios from '../axios';
 import { useNavigate, useParams } from "react-router-dom";
-import { Typography } from "@mui/material";
+import { Avatar, Skeleton, Stack, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchVideos } from "../Redux/slices/videos";
+import { Visibility } from "@mui/icons-material";
 
 const format = (seconds) => {
     if (isNaN(seconds)) {
@@ -30,15 +32,21 @@ const format = (seconds) => {
 
 const Player = () => {
     const dispatch = useDispatch();
-    // const { videos } = useSelector(state => state.videos);
-
     const params = useParams();
     const Navigate = useNavigate();
-    const [playerStates, setPlayerStates] = useState({
-        current: {},
-        list: {},
-        isLoading: true,
-    });
+    const { videos } = useSelector(state => state.videos);
+
+
+    const [currentVideo, setCurrentVideo] = useState({});
+    const [currentLoading, setCurrentLoading] = useState(true);
+
+    const listsLoading = videos.status === 'loading';
+
+    // const [playerStates, setPlayerStates] = useState({
+    //     current: {},
+    //     list: {},
+    //     isLoading: true,
+    // });
     const [nextCounter, setNextCounter] = useState({
         isNext: false,
         time: 5,
@@ -162,7 +170,7 @@ const Player = () => {
 
     const startNextVideoTimer = () => {
         clearTimeout(controlsTimerRef.current);
-        const next = playerStates.list[0];
+        const next = videos.items[0];
 
         controlsTimerRef.current = setTimeout(() => {
             return Navigate(`/video/${next._id}`);
@@ -206,45 +214,37 @@ const Player = () => {
     }, [videoStates.fullscreen]);
 
     useEffect(() => {
-
         cancelNextVideo();
-
         setControlsShow(true);
         startControlsTimer();
 
         const videoId = params.id;
-        const currIndex = videos.findIndex((el) => el._id == videoId);
-        const list = [];
 
-        for (let i = 0; i < videos.length; i++) {
-            const element = videos[i];
-            if (i === currIndex) {
-                continue;
-            }
-            list.push(videos[i]);
-        }
+        axios.get(`/videos/${videoId}`).then((res) => {
+            setCurrentVideo(res.data);
+            setCurrentLoading(false);
+        }).catch((err) => {
+            console.log(err);
+        });
 
-        setPlayerStates({
-            current: videos[currIndex],
-            list: list.sort(() => Math.random() - 0.3),
-            isLoading: false,
-        });
-        setVideoStates({
-            ...videoStates,
-            playing: true,
-        });
+        dispatch(fetchVideos(videoId));
+
     }, [params]);
 
     return (
         <div className="video">
             <div className="video__wrap">
                 <div className="video__player-wrap" ref={videoDivRef} onMouseMove={handleControlsShow}>
-                    {playerStates.isLoading ? 'loading...' : (
+                    {currentLoading ? (
+                        <>
+                            <Skeleton variant="rectangular" width={'100%'} height={450} />
+                        </>
+                    ) : (
                         <>
                             <ReactPlayer
                                 width={'100%'}
                                 height='100%'
-                                url={playerStates.current.videoSrc}
+                                url={currentVideo.videoSrc}
                                 ref={videoRef}
                                 className='video__player'
                                 controls={false}
@@ -268,7 +268,7 @@ const Player = () => {
                                 popOpen={popOpen}
                                 isNext={nextCounter.isNext}
                                 nextTime={nextCounter.time}
-                                nextVideo={playerStates.list[0]}
+                                nextVideo={videos.items[0]}
                                 playAndPause={handlePlayAndPause}
                                 rewind={handleRewind}
                                 fastForward={handleFastForward}
@@ -286,16 +286,72 @@ const Player = () => {
                         </>
                     )}
                 </div>
-                <div className="video__descr">
-                    <Typography variant={'h4'}>{playerStates.current.title}</Typography>
-                    <Typography variant={'subtitle1'}>{playerStates.current.author}</Typography>
+                <div className="video-list__desc">
+                    {currentLoading ? (
+                        <>
+                            <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                            <Stack
+                                direction="row"
+                                justifyContent="space-between"
+                                alignItems="center"
+                            >
+                                <Stack direction="row" spacing={1}>
+                                    <Skeleton variant="circular" width={26} height={26} />
+                                    <Skeleton variant="text" width={150} sx={{ fontSize: '2rem' }} />
+                                </Stack>
+                                <Stack direction="row" spacing={1}>
+                                    <Visibility fontSize="small" />
+                                    <Skeleton variant="text" width={100} sx={{ fontSize: '1rem' }} />
+                                </Stack>
+                            </Stack>
+                        </>
+                    ) : (
+                        <>
+                            <Typography variant="h4">{currentVideo.title}</Typography>
+                            <Stack
+                                direction="row"
+                                justifyContent="space-between"
+                                alignItems="center"
+                            >
+                                <Stack direction="row" spacing={1}>
+                                    <Avatar alt="Remy Sharp" sx={{ width: 26, height: 26 }} src="http://localhost:4400/uploads/musicImage/Anything_You_Need.jpg" />
+                                    <Typography variant="subtitle1">{currentVideo.author}</Typography>
+                                </Stack>
+                                <Stack direction="row" spacing={1}>
+                                    <Visibility fontSize="small" />
+                                    <Typography variant="body1">{currentVideo.watchedCount} просмотров</Typography>
+                                </Stack>
+                            </Stack>
+                        </>
+                    )}
                 </div>
             </div>
             <div className="videos__lists">
-                {playerStates.isLoading ? 'loading...' : (
-                    <Lists
-                        videos={playerStates.list}
-                    />
+                {listsLoading ? (
+                    <>
+                        {[1,2,3,4,5].map((item, i) => (
+                            <div
+                                key={i}
+                                className="video-list__item"
+                            >
+                                <div className="video-list__img">
+                                    <Skeleton variant="rounded" width={'100%'} height={88} />
+                                </div>
+                                <div className="video-list__desc">
+                                    <Skeleton variant="text" width={100} sx={{ fontSize: '2rem' }} />
+                                    <Skeleton variant="text" width={100} sx={{ fontSize: '1rem' }} />
+                                    <Skeleton variant="text" width={100} sx={{ fontSize: '1rem' }} />
+                                </div>
+                            </div>
+                        ))}
+                    </>
+                ) : (
+                    <>
+                        <Lists
+                            videos={videos.items}
+                            format={format}
+                        />
+                    </>
                 )}
             </div>
         </div>
