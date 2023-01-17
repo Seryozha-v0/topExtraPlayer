@@ -26,6 +26,9 @@ header {
 
 .video .video__player-wrap {
     position: relative;
+    min-height: 210px;
+    display: flex;
+    align-items: center;
     overflow: hidden;
 }
 
@@ -157,6 +160,7 @@ header {
         width: 100%;
     }
     .video__wrap {
+        margin-right: 0;
         margin-bottom: 50px;
     }
 }
