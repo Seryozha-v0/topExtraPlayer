@@ -5,11 +5,11 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
     return (
-        <div style={{ height: '50px', color: 'white', marginBottom: '10px', padding: '10px' }}>
-            <ButtonG variant="contained">
-                <Link to={"/video/"} style={{ color: 'inherit' }}>Главная</Link>
+        <header>
+            <ButtonG variant="outlined" href="/video/">
+                Главная
             </ButtonG>
-        </div>
+        </header>
     )
 };
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover } from "@mui/material";
 import ButtonM from "@mui/material/Button";
-import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff } from "@mui/icons-material";
+import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff, FullscreenExit } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const controls = ({
@@ -32,7 +32,7 @@ const controls = ({
     nextTime,
     cancelNext,
     nextVideo,
-    goNextVideo
+    isFullscreen
 }) => {
     const PrettoSlider = styled(Slider)({
         height: 5,
@@ -246,7 +246,11 @@ const controls = ({
                         </Popover>
 
                         <IconButton className="video__bottom-icons" onClick={fullScreenMode}>
-                            <Fullscreen fontSize="large" />
+                            {isFullscreen ? (
+                                <FullscreenExit fontSize="large" />
+                            ): (
+                                <Fullscreen fontSize = "large" />
+                            )}
                         </IconButton>
                     </Grid>
                 </Grid>

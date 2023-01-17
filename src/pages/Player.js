@@ -2,33 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import screenfull from "screenfull";
 import '../index.css';
-import videosL from '../videos';
-
-import Controls from '../components/Video/Controls';
-import Lists from '../components/Video/Lists';
 import axios from '../axios';
 import { useNavigate, useParams } from "react-router-dom";
 import { Avatar, Skeleton, Stack, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchVideos } from "../Redux/slices/videos";
 import { Visibility } from "@mui/icons-material";
-
-const format = (seconds) => {
-    if (isNaN(seconds)) {
-        return '00:00';
-    }
-
-    const date = new Date(seconds * 1000);
-    const hh = date.getUTCHours();
-    const mm = date.getUTCMinutes();
-    const ss = date.getUTCSeconds().toString().padStart(2, '0');
-
-    if (hh) {
-        return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`;
-    } else {
-        return `${mm.toString().padStart(2, '0')}:${ss}`;
-    }
-}
+import Controls from '../components/Video/Controls';
+import Lists from '../components/Video/Lists';
+import format from '../libs/format';
 
 const Player = () => {
     const dispatch = useDispatch();
@@ -42,11 +24,6 @@ const Player = () => {
 
     const listsLoading = videos.status === 'loading';
 
-    // const [playerStates, setPlayerStates] = useState({
-    //     current: {},
-    //     list: {},
-    //     isLoading: true,
-    // });
     const [nextCounter, setNextCounter] = useState({
         isNext: false,
         time: 5,
@@ -223,12 +200,15 @@ const Player = () => {
         axios.get(`/videos/${videoId}`).then((res) => {
             setCurrentVideo(res.data);
             setCurrentLoading(false);
+            setVideoStates({
+                ...videoStates,
+                playing: true,
+            });
         }).catch((err) => {
             console.log(err);
         });
 
         dispatch(fetchVideos(videoId));
-
     }, [params]);
 
     return (
@@ -269,6 +249,7 @@ const Player = () => {
                                 isNext={nextCounter.isNext}
                                 nextTime={nextCounter.time}
                                 nextVideo={videos.items[0]}
+                                isFullscreen={videoStates.fullscreen}
                                 playAndPause={handlePlayAndPause}
                                 rewind={handleRewind}
                                 fastForward={handleFastForward}
@@ -295,11 +276,11 @@ const Player = () => {
                                 justifyContent="space-between"
                                 alignItems="center"
                             >
-                                <Stack direction="row" spacing={1}>
+                                <Stack direction="row" alignItems='center' spacing={1}>
                                     <Skeleton variant="circular" width={26} height={26} />
                                     <Skeleton variant="text" width={150} sx={{ fontSize: '2rem' }} />
                                 </Stack>
-                                <Stack direction="row" spacing={1}>
+                                <Stack direction="row" alignItems='center' spacing={1}>
                                     <Visibility fontSize="small" />
                                     <Skeleton variant="text" width={100} sx={{ fontSize: '1rem' }} />
                                 </Stack>
@@ -313,11 +294,11 @@ const Player = () => {
                                 justifyContent="space-between"
                                 alignItems="center"
                             >
-                                <Stack direction="row" spacing={1}>
-                                    <Avatar alt="Remy Sharp" sx={{ width: 26, height: 26 }} src="http://localhost:4400/uploads/musicImage/Anything_You_Need.jpg" />
+                                <Stack direction="row" alignItems='center' spacing={1}>
+                                    <Avatar alt="Remy Sharp" sx={{ width: 26, height: 26 }} src="https://elements-video-cover-images-0.imgix.net/files/d485581a-d38d-497c-b737-8ab4d52fdf75/inline_image_preview.jpg?auto=compress%2Cformat&fit=min&h=225&w=400&s=669dd8d3e0bfeaf096fec1384896f75a" />
                                     <Typography variant="subtitle1">{currentVideo.author}</Typography>
                                 </Stack>
-                                <Stack direction="row" spacing={1}>
+                                <Stack direction="row" alignItems='center' spacing={1}>
                                     <Visibility fontSize="small" />
                                     <Typography variant="body1">{currentVideo.watchedCount} просмотров</Typography>
                                 </Stack>
@@ -349,7 +330,6 @@ const Player = () => {
                     <>
                         <Lists
                             videos={videos.items}
-                            format={format}
                         />
                     </>
                 )}

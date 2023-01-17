@@ -1,8 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
+import format from "../../libs/format";
+import { Visibility } from "@mui/icons-material";
 
-const Lists = ({ videos, format }) => {
+const Lists = ({ videos }) => {
     const Navigate = useNavigate();
     return (
         <>
@@ -17,9 +19,12 @@ const Lists = ({ videos, format }) => {
                         <div className="video-list__duration">{format(item.metaData.duration)}</div>
                     </div>
                     <div className="video-list__desc">
-                        <Typography variant="h6">{(item.title)}</Typography>
-                        <Typography variant="subtitle1">{item.author}</Typography>
-                        <Typography variant="body2">{item.watchedCount} просмотров</Typography>
+                        <Typography variant="subtitle1">{(item.title)}</Typography>
+                        <Typography variant="subtitle2">{item.author}</Typography>
+                        <Stack direction="row" alignItems='center' spacing={1}>
+                            <Visibility fontSize="small" />
+                            <Typography variant="caption">{item.watchedCount} просмотров</Typography>
+                        </Stack>
                     </div>
                 </div>
             ))}

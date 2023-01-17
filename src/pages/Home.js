@@ -4,23 +4,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchVideos } from "../Redux/slices/videos";
-
-const format = (seconds) => {
-    if (isNaN(seconds)) {
-        return '00:00';
-    }
-
-    const date = new Date(seconds * 1000);
-    const hh = date.getUTCHours();
-    const mm = date.getUTCMinutes();
-    const ss = date.getUTCSeconds().toString().padStart(2, '0');
-
-    if (hh) {
-        return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`;
-    } else {
-        return `${mm.toString().padStart(2, '0')}:${ss}`;
-    }
-}
+import format from '../libs/format';
 
 const Lists = ({ videos, format }) => {
     const Navigate = useNavigate();
@@ -38,11 +22,11 @@ const Lists = ({ videos, format }) => {
                     </div>
                     <div className="video-list__desc">
                         <Typography variant="h6">{item.title}</Typography>
-                        <Stack direction="row" spacing={1}>
-                            <Avatar alt="Remy Sharp" sx={{ width: 22, height: 22 }} src="http://localhost:4400/uploads/musicImage/Anything_You_Need.jpg" />
+                        <Stack direction="row" alignItems='center' spacing={1}>
+                            <Avatar alt="Remy Sharp" sx={{ width: 22, height: 22 }} src="https://elements-video-cover-images-0.imgix.net/files/d485581a-d38d-497c-b737-8ab4d52fdf75/inline_image_preview.jpg?auto=compress%2Cformat&fit=min&h=225&w=400&s=669dd8d3e0bfeaf096fec1384896f75a" />
                             <Typography variant="subtitle1">{item.author}</Typography>
                         </Stack>
-                        <Stack direction="row" spacing={1}>
+                        <Stack direction="row" alignItems='center' spacing={1}>
                             <Visibility fontSize="small" />
                             <Typography variant="body2">{item.watchedCount} просмотров</Typography>
                         </Stack>
