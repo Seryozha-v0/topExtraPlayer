@@ -4,6 +4,9 @@ import ButtonM from "@mui/material/Button";
 import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff, FullscreenExit } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
+import "react-video-seek-slider/styles.css";
+import { VideoSeekSlider } from "react-video-seek-slider";
+
 const controls = ({
     controlsShow,
     playing,
@@ -12,7 +15,6 @@ const controls = ({
     fastForward,
     played,
     onSeek,
-    onMouseSeekUp,
     playedTime,
     fullMovieTime,
     muted,
@@ -32,45 +34,12 @@ const controls = ({
     nextTime,
     cancelNext,
     nextVideo,
-    isFullscreen
+    isFullscreen,
+    handleTimeChange,
+    maxDuration,
+    timeCodes,
+    buffer
 }) => {
-    const PrettoSlider = styled(Slider)({
-        height: 5,
-        '& .MuiSlider-track': {
-            border: 'none',
-        },
-        '& .MuiSlider-thumb': {
-            height: 16,
-            width: 16,
-            backgroundColor: '#fff',
-            border: '2px solid currentColor',
-            '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
-                boxShadow: 'inherit',
-            },
-            '&:before': {
-                dsiplay: 'none',
-            },
-        },
-        '& .MuiSlider-valueLabel': {
-            lineHeight: 1.2,
-            fontSize: 12,
-            background: 'unset',
-            padding: 0,
-            width: 32,
-            height: 32,
-            borderRadius: '50% 50% 50% 0',
-            backgroundColor: 'blue',
-            transformOrigin: 'bottom left',
-            transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-            '&:before': { display: 'none' },
-            '&.MuiSlider-valueLabelOpen': {
-                transform: 'Translate(50%, -100%) rotate(-45deg) scale(1)',
-            },
-            '& > *': {
-                transform: 'rotate(45deg)',
-            },
-        },
-    });
 
     return (
         <div className={`video__controls ${controlsShow ? "video__controls_active" : ""}`}>
@@ -149,13 +118,14 @@ const controls = ({
                     justifyContent='space-between'
                     style={{ padding: 2 }}
                 >
-                    <Grid item xs={12}>
-                        <PrettoSlider
-                            min={0}
-                            max={100}
-                            value={played * 100}
+                    <Grid item xs={12} style={{ marginBottom: 25 }}>
+                        <VideoSeekSlider
+                            max={maxDuration}
+                            currentTime={played}
+                            bufferTime={buffer}
                             onChange={onSeek}
-                            onChangeCommitted={onMouseSeekUp}
+                            secondsPrefix="00:"
+                            timeCodes={timeCodes}
                         />
                     </Grid>
 
@@ -248,8 +218,8 @@ const controls = ({
                         <IconButton className="video__bottom-icons" onClick={fullScreenMode}>
                             {isFullscreen ? (
                                 <FullscreenExit fontSize="large" />
-                            ): (
-                                <Fullscreen fontSize = "large" />
+                            ) : (
+                                <Fullscreen fontSize="large" />
                             )}
                         </IconButton>
                     </Grid>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import screenfull from "screenfull";
 import '../index.css';
@@ -36,14 +36,17 @@ const Player = () => {
         videoBackRate: 1.0,
         played: 0,
         fullscreen: false,
+        buffer: 0,
     });
     const [controlsShow, setControlsShow] = useState(true);
 
-    const { playing, muted, volume, videoBackRate, played } = videoStates;
+    const { playing, muted, volume, videoBackRate, buffer, played, playedSeconds } = videoStates;
     const videoRef = useRef(null);
 
-    const currVideoTime = videoRef.current ? videoRef.current.getCurrentTime() : '00:00';
-    const movieDirection = videoRef.current ? videoRef.current.getDuration() : '00:00';
+    const currVideoTime = videoRef.current ? videoRef.current.getCurrentTime() : '00';
+    const movieDirection = videoRef.current ? videoRef.current.getDuration() : '00';
+
+    const maxDuration = movieDirection * 1000;
 
     const playedTime = format(currVideoTime);
     const fullMovieTime = format(movieDirection);
@@ -107,14 +110,14 @@ const Player = () => {
 
     const handleVideoProgress = (state) => {
         if (!videoStates.seeking) {
-            setVideoStates({ ...videoStates, ...state })
+            setVideoStates({ ...videoStates, buffer: state.loadedSeconds * 1000, playedSeconds: state.playedSeconds * 1000});
         }
     }
 
-    const handleVideoSeek = (value) => {
-        setVideoStates({ ...videoStates, played: parseFloat(value.target.value / 100) });
-        videoRef.current.seekTo(parseFloat(value.target.value / 100));
-    }
+    const handleVideoSeek = useCallback((time, offsetTime) => {
+        setVideoStates({ ...videoStates, playedSeconds: time });
+        videoRef.current.seekTo(time / 1000);
+    }, []);
 
     const handleVideoMouseSeekUp = (value) => {
         setVideoStates({ ...videoStates, seeking: false });
@@ -236,9 +239,11 @@ const Player = () => {
                             />
                             <Controls
                                 controlsShow={controlsShow}
+                                maxDuration={maxDuration}
                                 playing={videoStates.playing}
-                                played={played}
+                                played={playedSeconds}
                                 playedTime={playedTime}
+                                buffer={buffer}
                                 fullMovieTime={fullMovieTime}
                                 muted={muted}
                                 volume={volume}
@@ -250,11 +255,11 @@ const Player = () => {
                                 nextTime={nextCounter.time}
                                 nextVideo={videos.items[0]}
                                 isFullscreen={videoStates.fullscreen}
+                                timeCodes={currentVideo.timeCodes}
                                 playAndPause={handlePlayAndPause}
                                 rewind={handleRewind}
                                 fastForward={handleFastForward}
                                 onSeek={handleVideoSeek}
-                                onMouseSeekUp={handleVideoMouseSeekUp}
                                 muting={handleMuting}
                                 volumeChange={handleVolumeChange}
                                 volumeSeek={handleVolumeSeek}
@@ -310,7 +315,7 @@ const Player = () => {
             <div className="videos__lists">
                 {listsLoading ? (
                     <>
-                        {[1,2,3,4,5].map((item, i) => (
+                        {[1, 2, 3, 4, 5].map((item, i) => (
                             <div
                                 key={i}
                                 className="video-list__item"

@@ -152,6 +152,14 @@ header {
     padding: 10px;
 }
 
+.video .ui-video-seek-slider .track .main .connect {
+    background-color: #1a78d6;
+}
+
+.video .ui-video-seek-slider .thumb .handler {
+    background-color: #1976d2;
+}
+
 @media (max-width: 968px) {
     .video {
         flex-direction: column;
