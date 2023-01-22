@@ -110,7 +110,20 @@ const Player = () => {
 
     const handleVideoProgress = (state) => {
         if (!videoStates.seeking) {
-            setVideoStates({ ...videoStates, buffer: state.loadedSeconds * 1000, playedSeconds: state.playedSeconds * 1000});
+            setVideoStates({ ...videoStates, buffer: state.loadedSeconds * 1000, playedSeconds: state.playedSeconds * 1000 });
+        }
+        if (currentVideo.timeCodes) {
+            for (let i = 0; i < currentVideo.timeCodes.length; i++) {
+                const el = currentVideo.timeCodes[i];
+                const nextEl = currentVideo.timeCodes[i + 1];
+                const currentMs = parseFloat(state.playedSeconds * 1000);
+
+                if (currentMs >= el.fromMs && currentMs < ((i + 1 < currentVideo.timeCodes.length) ? nextEl?.fromMs : maxDuration)) {
+                    console.log(el.fromMs);
+                    console.log(state.playedSeconds * 1000);
+                    break;
+                }
+            }
         }
     }
 
