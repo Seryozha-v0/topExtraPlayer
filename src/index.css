@@ -61,7 +61,6 @@ header {
 .video .video__icons {
     display: block;
     color: #fff;
-    font-size: 44px;
     padding: 5px;
     transform: scale(.9);
 }

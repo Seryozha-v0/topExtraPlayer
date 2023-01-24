@@ -11,6 +11,7 @@ import { Visibility } from "@mui/icons-material";
 import Controls from '../components/Video/Controls';
 import Lists from '../components/Video/Lists';
 import format from '../libs/format';
+import Episodes from "../components/Video/Episodes";
 
 const Player = () => {
     const dispatch = useDispatch();
@@ -143,6 +144,10 @@ const Player = () => {
         setVideoStates({ ...videoStates, playedSeconds: time });
         videoRef.current.seekTo(time / 1000);
     }, []);
+
+    const handleVideoSeekTimeCode = (time) => {
+        videoRef.current.seekTo(time / 1000);
+    }
 
     const handleMuting = () => {
         setVideoStates({ ...videoStates, muted: !videoStates.muted })
@@ -281,7 +286,7 @@ const Player = () => {
                                 muted={muted}
                                 volume={volume}
                                 videoBackRate={videoBackRate}
-                                
+
                                 nextEnabled={nextCounter.enabled}
                                 isNext={nextCounter.isNext}
                                 nextTime={nextCounter.time}
@@ -300,7 +305,7 @@ const Player = () => {
                                 volumeChange={handleVolumeChange}
                                 volumeSeek={handleVolumeSeek}
                                 videoRate={handleVideoRate}
-                                
+
                                 fullScreenMode={handleFullScreenMode}
                                 cancelNext={cancelNextVideo}
                                 menuClick={handleMenuClick}
@@ -373,6 +378,11 @@ const Player = () => {
                     </>
                 ) : (
                     <>
+                        <Episodes
+                            episodes={currentVideo.timeCodes}
+                            timeCodeIndex={videoStates.timeCodeIndex}
+                            seekTo={handleVideoSeekTimeCode}
+                        />
                         <Lists
                             videos={videos.items}
                         />

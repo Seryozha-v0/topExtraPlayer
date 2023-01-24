@@ -1,6 +1,5 @@
 import React from "react";
 import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover, Menu, List, ListSubheader, ListItem, ListItemText, Switch, ListItemButton } from "@mui/material";
-import ButtonM from "@mui/material/Button";
 import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff, FullscreenExit, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
@@ -142,9 +141,9 @@ const controls = ({
                         >
                             <IconButton className="video__icons" aria-label="reqind" onClick={playAndPause}>
                                 {playing ? (
-                                    <PauseSharp fontSize="large" style={{ color: '#fff' }} />
+                                    <PauseSharp fontSize="medium" style={{ color: '#fff' }} />
                                 ) : (
-                                    <PlayArrowSharp fontSize="large" style={{ color: '#fff' }} />
+                                    <PlayArrowSharp fontSize="medium" style={{ color: '#fff' }} />
                                 )}
                             </IconButton>
 
@@ -152,14 +151,14 @@ const controls = ({
                                 <Grid
                                     container
                                     alignItems='center'
-                                    style={{ minWidth: '150px' }}
+                                    style={{ minWidth: 100 }}
                                 >
                                     <Grid item>
                                         <IconButton className="video__icons" aria-label="reqind" onClick={muting}>
                                             {muted ? (
-                                                <VolumeOff fontSize="large" style={{ color: '#fff' }} />
+                                                <VolumeOff fontSize="medium" style={{ color: '#fff' }} />
                                             ) : (
-                                                <VolumeUp fontSize="large" style={{ color: '#fff' }} />
+                                                <VolumeUp fontSize="medium" style={{ color: '#fff' }} />
                                             )}
                                         </IconButton>
                                     </Grid>
@@ -169,6 +168,7 @@ const controls = ({
                                             max={100}
                                             value={volume * 100}
                                             step={10}
+                                            size="small"
                                             valueLabelDisplay="auto"
                                             className='video__slider'
                                             onChange={volumeChange}
@@ -179,11 +179,11 @@ const controls = ({
                             </Grid>
 
                             <Grid item ml={2}>
-                                <Typography variant="h7" style={{ color: 'white' }} >
+                                <Typography variant="caption" style={{ color: 'white' }} >
                                     {playedTime}
                                 </Typography>
                                 /
-                                <Typography variant="h7" style={{ color: 'white' }} >
+                                <Typography variant="caption" style={{ color: 'white' }} >
                                     {fullMovieTime}
                                 </Typography>
                             </Grid>
@@ -243,7 +243,7 @@ const controls = ({
                             onClose={subMenuClose}
                             anchorOrigin={{
                                 vertical: 'top',
-                                horizontal: 'left',
+                                horizontal: 'right',
                             }}
                             transformOrigin={{
                                 vertical: 'bottom',
@@ -272,9 +272,9 @@ const controls = ({
 
                         <IconButton className="video__bottom-icons" onClick={fullScreenMode}>
                             {isFullscreen ? (
-                                <FullscreenExit fontSize="large" />
+                                <FullscreenExit fontSize="medium" />
                             ) : (
-                                <Fullscreen fontSize="large" />
+                                <Fullscreen fontSize="medium" />
                             )}
                         </IconButton>
                     </Grid>
