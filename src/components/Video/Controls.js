@@ -1,6 +1,6 @@
 import React from "react";
-import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover, Menu, List, ListSubheader, ListItem, ListItemText, Switch, ListItemButton } from "@mui/material";
-import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff, FullscreenExit, Settings } from "@mui/icons-material";
+import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover, Menu, List, ListSubheader, ListItem, ListItemText, Switch, ListItemButton, ListItemIcon, Divider } from "@mui/material";
+import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff, FullscreenExit, Settings, PictureInPictureAlt, Speed } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 import "react-video-seek-slider/styles.css";
@@ -42,7 +42,9 @@ const controls = ({
     isFullscreen,
     maxDuration,
     timeCodes,
-    buffer
+    buffer,
+    pip,
+    pipClick
 }) => {
 
     return (
@@ -223,6 +225,20 @@ const controls = ({
                                         />
                                     </ListItemButton>
                                 </ListItem>
+                                <Divider />
+                                <ListItem>
+                                    <ListItemButton onClick={pipClick}>
+                                        <ListItemIcon sx={{ minWidth: 30 }}>
+                                            <PictureInPictureAlt size="small" />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Картинка в картинке" />
+                                        <Switch
+                                            edge="end"
+                                            size="small"
+                                            checked={pip}
+                                        />
+                                    </ListItemButton>
+                                </ListItem>
                                 <ListItem
                                     secondaryAction={
                                         <ListItemButton onClick={subMenuClick}>
@@ -231,6 +247,9 @@ const controls = ({
                                     }
                                 >
                                     <ListItemButton onClick={subMenuClick}>
+                                        <ListItemIcon sx={{ minWidth: 30 }}>
+                                            <Speed size="small" />
+                                        </ListItemIcon>
                                         <ListItemText primary="Скорость" />
                                     </ListItemButton>
                                 </ListItem>
@@ -251,7 +270,13 @@ const controls = ({
                             }}
                         >
                             <List
-                                sx={{ width: 280 }}
+                                sx={{
+                                    width: 280,
+                                    maxHeight: 140,
+                                    position: 'relative',
+                                    overflow: 'auto',
+                                    '& ul': { padding: 0 },
+                                }}
                                 subheader={<ListSubheader>Скорость</ListSubheader>}
                                 dense={true}
                             >

@@ -39,7 +39,8 @@ const Player = () => {
         played: 0,
         fullscreen: false,
         buffer: 0,
-        timeCodeIndex: 0
+        timeCodeIndex: 0,
+        pip: false
     });
     const [controlsShow, setControlsShow] = useState(true);
 
@@ -222,6 +223,16 @@ const Player = () => {
         }
     }
 
+    const handlePipMode = () => {
+        setVideoStates({...videoStates, pip: !videoStates.pip});
+    }
+
+    useEffect(() => {
+        if (!document.pictureInPictureElement) {
+            setVideoStates({...videoStates, pip: false});
+        }
+    }, [document.pictureInPictureElement]);
+
     useEffect(() => {
         if (videoStates.fullscreen) {
             screenfull.request(videoDivRef.current);
@@ -270,6 +281,7 @@ const Player = () => {
                                 controls={false}
                                 playing={playing}
                                 muted={muted}
+                                pip={videoStates.pip}
                                 onProgress={handleVideoProgress}
                                 playbackRate={videoBackRate}
                                 onEnded={ended}
@@ -286,7 +298,7 @@ const Player = () => {
                                 muted={muted}
                                 volume={volume}
                                 videoBackRate={videoBackRate}
-
+                                pip={videoStates.pip}
                                 nextEnabled={nextCounter.enabled}
                                 isNext={nextCounter.isNext}
                                 nextTime={nextCounter.time}
@@ -305,7 +317,7 @@ const Player = () => {
                                 volumeChange={handleVolumeChange}
                                 volumeSeek={handleVolumeSeek}
                                 videoRate={handleVideoRate}
-
+                                pipClick={handlePipMode}
                                 fullScreenMode={handleFullScreenMode}
                                 cancelNext={cancelNextVideo}
                                 menuClick={handleMenuClick}
