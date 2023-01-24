@@ -25,6 +25,7 @@ const Player = () => {
     const listsLoading = videos.status === 'loading';
 
     const [nextCounter, setNextCounter] = useState({
+        enabled: true,
         isNext: false,
         time: 5,
     });
@@ -37,6 +38,7 @@ const Player = () => {
         played: 0,
         fullscreen: false,
         buffer: 0,
+        timeCodeIndex: 0
     });
     const [controlsShow, setControlsShow] = useState(true);
 
@@ -55,24 +57,33 @@ const Player = () => {
     const controlsTimerRef = useRef(null);
     const nextTimeRef = useRef(null);
 
-    //Popover
-    const [anchorEl, setAnchorEl] = useState(null);
-    const handlePopClick = (e) => {
-        setAnchorEl(e.currentTarget);
-    };
-    const handlePopClose = () => {
-        setAnchorEl(null);
-    };
-    const popOpen = Boolean(anchorEl);
-    const popId = popOpen ? 'simple-popover' : undefined;
+    //Menu
+    const [anchorMenuEl, setAnchorMenuEl] = useState(null);
+    const [anchorSubMenuEl, setAnchorSubMenuEl] = useState(null);
+    const openMenu = Boolean(anchorMenuEl);
+    const openSubMenu = Boolean(anchorSubMenuEl);
 
+    const handleMenuClick = (e) => {
+        setAnchorMenuEl(e.currentTarget);
+    };
+    const handleSubMenuClick = () => {
+        setAnchorSubMenuEl(anchorMenuEl);
+        setAnchorMenuEl(null);
+    };
+    const handleMenuClose = () => {
+        setAnchorMenuEl(null);
+    };
+    const handleSubMenuClose = () => {
+        setAnchorSubMenuEl(null);
+    };
 
     const startControlsTimer = () => {
         clearInterval(controlsTimerRef.current);
 
         controlsTimerRef.current = setTimeout(() => {
             setControlsShow(false);
-            handlePopClose();
+            setAnchorMenuEl(null);
+            setAnchorSubMenuEl(null);
         }, 3000);
     }
 
@@ -110,32 +121,28 @@ const Player = () => {
 
     const handleVideoProgress = (state) => {
         if (!videoStates.seeking) {
-            setVideoStates({ ...videoStates, buffer: state.loadedSeconds * 1000, playedSeconds: state.playedSeconds * 1000 });
-        }
-        if (currentVideo.timeCodes) {
-            for (let i = 0; i < currentVideo.timeCodes.length; i++) {
-                const el = currentVideo.timeCodes[i];
-                const nextEl = currentVideo.timeCodes[i + 1];
-                const currentMs = parseFloat(state.playedSeconds * 1000);
+            if (currentVideo.timeCodes) {
+                for (let i = 0; i < currentVideo.timeCodes.length; i++) {
+                    const el = currentVideo.timeCodes[i];
+                    const nextEl = currentVideo.timeCodes[i + 1];
+                    const currentMs = parseFloat(state.playedSeconds * 1000);
 
-                if (currentMs >= el.fromMs && currentMs < ((i + 1 < currentVideo.timeCodes.length) ? nextEl?.fromMs : maxDuration)) {
-                    console.log(el.fromMs);
-                    console.log(state.playedSeconds * 1000);
-                    break;
+                    if (currentMs >= el.fromMs && currentMs < ((i + 1 < currentVideo.timeCodes.length) ? nextEl.fromMs : maxDuration)) {
+                        setVideoStates({ ...videoStates, timeCodeIndex: i, buffer: state.loadedSeconds * 1000, playedSeconds: state.playedSeconds * 1000 });
+                        break;
+                    }
                 }
+            } else {
+                setVideoStates({ ...videoStates, buffer: state.loadedSeconds * 1000, playedSeconds: state.playedSeconds * 1000 });
             }
         }
+
     }
 
     const handleVideoSeek = useCallback((time, offsetTime) => {
         setVideoStates({ ...videoStates, playedSeconds: time });
         videoRef.current.seekTo(time / 1000);
     }, []);
-
-    const handleVideoMouseSeekUp = (value) => {
-        setVideoStates({ ...videoStates, seeking: false });
-        videoRef.current.seekTo(value / 100);
-    }
 
     const handleMuting = () => {
         setVideoStates({ ...videoStates, muted: !videoStates.muted })
@@ -158,7 +165,7 @@ const Player = () => {
 
     const handleVideoRate = (rate) => {
         setVideoStates({ ...videoStates, videoBackRate: rate });
-        handlePopClose();
+        handleSubMenuClose();
     }
 
     const startNextVideoTimer = () => {
@@ -173,7 +180,7 @@ const Player = () => {
     const cancelNextVideo = () => {
         clearTimeout(controlsTimerRef.current);
         clearInterval(nextTimeRef.current);
-        setNextCounter({ isNext: false, time: 5 });
+        setNextCounter({ ...nextCounter, isNext: false, time: 5 });
     }
 
     const startNextCancelTimer = () => {
@@ -181,6 +188,7 @@ const Player = () => {
 
         nextTimeRef.current = setInterval(() => {
             setNextCounter({
+                ...nextCounter,
                 isNext: true,
                 time: --nextCounter.time,
             })
@@ -194,8 +202,19 @@ const Player = () => {
         });
         clearInterval(controlsTimerRef.current);
         setControlsShow(true);
-        startNextVideoTimer();
-        startNextCancelTimer();
+        if (nextCounter.enabled) {
+            startNextVideoTimer();
+            startNextCancelTimer();
+        }
+    }
+
+    const handleNextToggle = () => {
+        if (nextCounter.enabled) {
+            cancelNextVideo();
+            setNextCounter({ ...nextCounter, isNext: false, enabled: !nextCounter.enabled });
+        } else {
+            setNextCounter({ ...nextCounter, enabled: !nextCounter.enabled });
+        }
     }
 
     useEffect(() => {
@@ -251,6 +270,7 @@ const Player = () => {
                                 onEnded={ended}
                             />
                             <Controls
+                                conteinerRef={videoDivRef.current}
                                 controlsShow={controlsShow}
                                 maxDuration={maxDuration}
                                 playing={videoStates.playing}
@@ -261,12 +281,15 @@ const Player = () => {
                                 muted={muted}
                                 volume={volume}
                                 videoBackRate={videoBackRate}
-                                anchorEl={anchorEl}
-                                id={popId}
-                                popOpen={popOpen}
+                                
+                                nextEnabled={nextCounter.enabled}
                                 isNext={nextCounter.isNext}
                                 nextTime={nextCounter.time}
                                 nextVideo={videos.items[0]}
+                                anchorMenuEl={anchorMenuEl}
+                                anchorSubMenuEl={anchorSubMenuEl}
+                                openMenu={openMenu}
+                                openSubMenu={openSubMenu}
                                 isFullscreen={videoStates.fullscreen}
                                 timeCodes={currentVideo.timeCodes}
                                 playAndPause={handlePlayAndPause}
@@ -277,10 +300,14 @@ const Player = () => {
                                 volumeChange={handleVolumeChange}
                                 volumeSeek={handleVolumeSeek}
                                 videoRate={handleVideoRate}
-                                popClick={handlePopClick}
-                                popClose={handlePopClose}
+                                
                                 fullScreenMode={handleFullScreenMode}
                                 cancelNext={cancelNextVideo}
+                                menuClick={handleMenuClick}
+                                subMenuClick={handleSubMenuClick}
+                                menuClose={handleMenuClose}
+                                subMenuClose={handleSubMenuClose}
+                                nextEnabledToggle={handleNextToggle}
                             />
                         </>
                     )}
@@ -306,7 +333,7 @@ const Player = () => {
                         </>
                     ) : (
                         <>
-                            <Typography variant="h4">{currentVideo.title}</Typography>
+                            <Typography variant="h4">{currentVideo.title}{currentVideo.timeCodes ? ` | ${currentVideo.timeCodes[videoStates.timeCodeIndex].description}` : ''}</Typography>
                             <Stack
                                 direction="row"
                                 justifyContent="space-between"

@@ -1,13 +1,14 @@
 import React from "react";
-import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover } from "@mui/material";
+import { Grid, Typography, IconButton, Button, Slider, styled, SpeedDial, Popover, Menu, List, ListSubheader, ListItem, ListItemText, Switch, ListItemButton } from "@mui/material";
 import ButtonM from "@mui/material/Button";
-import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff, FullscreenExit } from "@mui/icons-material";
+import { FastForwardSharp, FastRewind, PlayArrowSharp, PauseSharp, VolumeUp, Fullscreen, VolumeOff, FullscreenExit, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 import "react-video-seek-slider/styles.css";
 import { VideoSeekSlider } from "react-video-seek-slider";
 
 const controls = ({
+    conteinerRef,
     controlsShow,
     playing,
     playAndPause,
@@ -24,18 +25,22 @@ const controls = ({
     volumeSeek,
     videoRate,
     videoBackRate,
-    popClick,
-    popClose,
-    anchorEl,
-    id,
-    popOpen,
     fullScreenMode,
+    nextEnabled,
     isNext,
     nextTime,
     cancelNext,
     nextVideo,
+    anchorMenuEl,
+    anchorSubMenuEl,
+    openMenu,
+    openSubMenu,
+    menuClick,
+    subMenuClick,
+    menuClose,
+    subMenuClose,
+    nextEnabledToggle,
     isFullscreen,
-    handleTimeChange,
     maxDuration,
     timeCodes,
     buffer
@@ -187,33 +192,83 @@ const controls = ({
                     </Grid>
 
                     <Grid item>
-                        <Button variant="text" className="video__bottom-icons" onClick={popClick}>
-                            <Typography>{videoBackRate}x</Typography>
-                        </Button>
-                        <Popover
-                            id={id}
-                            open={popOpen}
-                            anchorEl={anchorEl}
-                            onClose={popClose}
+                        <IconButton className="video__bottom-icons" aria-label="reqind" onClick={menuClick}>
+                            <Settings />
+                        </IconButton>
+                        <Menu
+                            container={conteinerRef}
+                            anchorEl={anchorMenuEl}
+                            open={openMenu}
+                            onClose={menuClose}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                        >
+                            <List
+                                sx={{ width: 280 }}
+                                dense={true}
+                            >
+                                <ListItem>
+                                    <ListItemButton onClick={nextEnabledToggle}>
+                                        <ListItemText primary="Автовоспроизведение" />
+                                        <Switch
+                                            edge="end"
+                                            size="small"
+                                            checked={nextEnabled}
+                                        />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem
+                                    secondaryAction={
+                                        <ListItemButton onClick={subMenuClick}>
+                                            <ListItemText primary={`${videoBackRate}x`} />
+                                        </ListItemButton>
+                                    }
+                                >
+                                    <ListItemButton onClick={subMenuClick}>
+                                        <ListItemText primary="Скорость" />
+                                    </ListItemButton>
+                                </ListItem>
+                            </List>
+                        </Menu>
+                        <Menu
+                            container={conteinerRef}
+                            anchorEl={anchorSubMenuEl}
+                            open={openSubMenu}
+                            onClose={subMenuClose}
                             anchorOrigin={{
                                 vertical: 'top',
                                 horizontal: 'left',
                             }}
                             transformOrigin={{
                                 vertical: 'bottom',
-                                horizontal: 'left',
+                                horizontal: 'right',
                             }}
                         >
-                            <Grid container direction='column-reverse'>
+                            <List
+                                sx={{ width: 280 }}
+                                subheader={<ListSubheader>Скорость</ListSubheader>}
+                                dense={true}
+                            >
                                 {
                                     [0.5, 1, 1.25, 1.5, 2].map((rate) => (
-                                        <Button key={rate} variant="text" className="video__bottom-icons" onClick={() => videoRate(rate)}>
+                                        <ListItemButton
+                                            key={rate}
+                                            variant="text"
+                                            onClick={() => videoRate(rate)}
+                                            selected={rate === videoBackRate}
+                                        >
                                             <Typography color={rate === videoBackRate ? 'secondary' : 'default'}>{rate}x</Typography>
-                                        </Button>
+                                        </ListItemButton>
                                     ))
                                 }
-                            </Grid>
-                        </Popover>
+                            </List>
+                        </Menu>
 
                         <IconButton className="video__bottom-icons" onClick={fullScreenMode}>
                             {isFullscreen ? (
