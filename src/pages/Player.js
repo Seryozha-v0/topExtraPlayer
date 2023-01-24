@@ -378,11 +378,13 @@ const Player = () => {
                     </>
                 ) : (
                     <>
-                        <Episodes
-                            episodes={currentVideo.timeCodes}
-                            timeCodeIndex={videoStates.timeCodeIndex}
-                            seekTo={handleVideoSeekTimeCode}
-                        />
+                        {currentVideo.timeCodes ? (
+                            <Episodes
+                                episodes={currentVideo.timeCodes}
+                                timeCodeIndex={videoStates.timeCodeIndex}
+                                seekTo={handleVideoSeekTimeCode}
+                            />
+                        ) : ('')}
                         <Lists
                             videos={videos.items}
                         />
