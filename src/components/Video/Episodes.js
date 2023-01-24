@@ -24,7 +24,7 @@ const Episodes = ({ episodes, timeCodeIndex, seekTo }) => {
                     <ListItemButton
                         key={i}
                         selected={i === timeCodeIndex}
-                        autoFocus={i === timeCodeIndex}
+                        // autoFocus={i === timeCodeIndex}
                         onClick={() => seekTo(episode.fromMs)}
                     >
                         <ListItemText primary={`${format(episode.fromMs / 1000)} | ${episode.description}`} />
