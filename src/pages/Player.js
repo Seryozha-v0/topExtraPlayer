@@ -42,6 +42,7 @@ const Player = () => {
         timeCodeIndex: 0,
         pip: false
     });
+    const [currentTime, setCurrentTime] = useState(0);
     const [controlsShow, setControlsShow] = useState(true);
 
     const { playing, muted, volume, videoBackRate, buffer, played, playedSeconds } = videoStates;
@@ -138,13 +139,11 @@ const Player = () => {
                 setVideoStates({ ...videoStates, buffer: state.loadedSeconds * 1000, playedSeconds: state.playedSeconds * 1000 });
             }
         }
-
     }
 
     const handleVideoSeek = useCallback((time, offsetTime) => {
-        setVideoStates({ ...videoStates, playedSeconds: time });
         videoRef.current.seekTo(time / 1000);
-    }, []);
+    }, []); 
 
     const handleVideoSeekTimeCode = (time) => {
         videoRef.current.seekTo(time / 1000);
@@ -350,7 +349,7 @@ const Player = () => {
                         </>
                     ) : (
                         <>
-                            <Typography variant="h4">{currentVideo.title}{currentVideo.timeCodes ? ` | ${currentVideo.timeCodes[videoStates.timeCodeIndex].description}` : ''}</Typography>
+                            <Typography variant="h4">{currentVideo.title}</Typography>
                             <Stack
                                 direction="row"
                                 justifyContent="space-between"
