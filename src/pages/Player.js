@@ -124,6 +124,8 @@ const Player = () => {
 
     const handleVideoProgress = (state) => {
         if (!videoStates.seeking) {
+            setCurrentTime(state.playedSeconds * 1000);
+
             if (currentVideo.timeCodes) {
                 for (let i = 0; i < currentVideo.timeCodes.length; i++) {
                     const el = currentVideo.timeCodes[i];
@@ -131,22 +133,24 @@ const Player = () => {
                     const currentMs = parseFloat(state.playedSeconds * 1000);
 
                     if (currentMs >= el.fromMs && currentMs < ((i + 1 < currentVideo.timeCodes.length) ? nextEl.fromMs : maxDuration)) {
-                        setVideoStates({ ...videoStates, timeCodeIndex: i, buffer: state.loadedSeconds * 1000, playedSeconds: state.playedSeconds * 1000 });
+                        setVideoStates({ ...videoStates, timeCodeIndex: i, buffer: state.loadedSeconds * 1000 });
                         break;
                     }
                 }
             } else {
-                setVideoStates({ ...videoStates, buffer: state.loadedSeconds * 1000, playedSeconds: state.playedSeconds * 1000 });
+                setVideoStates({ ...videoStates, buffer: state.loadedSeconds * 1000});
             }
         }
     }
 
     const handleVideoSeek = useCallback((time, offsetTime) => {
         videoRef.current.seekTo(time / 1000);
-    }, []); 
+        setCurrentTime(time);
+    }, []);
 
     const handleVideoSeekTimeCode = (time) => {
         videoRef.current.seekTo(time / 1000);
+        setCurrentTime(time);
     }
 
     const handleMuting = () => {
@@ -223,12 +227,12 @@ const Player = () => {
     }
 
     const handlePipMode = () => {
-        setVideoStates({...videoStates, pip: !videoStates.pip});
+        setVideoStates({ ...videoStates, pip: !videoStates.pip });
     }
 
     useEffect(() => {
         if (!document.pictureInPictureElement) {
-            setVideoStates({...videoStates, pip: false});
+            setVideoStates({ ...videoStates, pip: false });
         }
     }, [document.pictureInPictureElement]);
 
@@ -292,6 +296,7 @@ const Player = () => {
                                 playing={videoStates.playing}
                                 played={playedSeconds}
                                 playedTime={playedTime}
+                                currentTime={currentTime}
                                 buffer={buffer}
                                 fullMovieTime={fullMovieTime}
                                 muted={muted}

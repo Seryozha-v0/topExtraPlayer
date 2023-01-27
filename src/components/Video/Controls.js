@@ -44,7 +44,8 @@ const controls = ({
     timeCodes,
     buffer,
     pip,
-    pipClick
+    pipClick,
+    currentTime
 }) => {
 
     return (
@@ -127,7 +128,7 @@ const controls = ({
                     <Grid item xs={12} style={{ marginBottom: 25 }}>
                         <VideoSeekSlider
                             max={maxDuration}
-                            currentTime={played}
+                            currentTime={currentTime}
                             bufferTime={buffer}
                             onChange={onSeek}
                             secondsPrefix="00:"
